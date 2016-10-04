@@ -6,7 +6,7 @@ import sys
 import datetime
 
 # Include I/O library for python in PYTHON PATH
-galileo_path = ""
+galileo_path = "/var/project"
 if galileo_path not in sys.path:
     sys.path.append(galileo_path);
 
