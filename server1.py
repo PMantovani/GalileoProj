@@ -14,8 +14,8 @@ import pyGalileo
 
 
 PORT = 8000
-TEMP_PIN = 666666
-LUM_PIN = 66666666
+TEMP_PIN = A0
+LUM_PIN = A1
 
 # Handler used for handling HTTP requests
 class PersistentHandler(SimpleHTTPRequestHandler):
@@ -25,7 +25,7 @@ class PersistentHandler(SimpleHTTPRequestHandler):
 def UpdateSensorValues(threading.thread):
     temperature = analogRead(TEMP_PIN)
     luminosity = analogRead(LUM_PIN)
-    file = open('indexRaw.html', 'r')
+    file = open('index_std.html', 'r')
     fileStr = file.read()
     file.close()
 
