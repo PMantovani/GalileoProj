@@ -1,6 +1,7 @@
 import socket
 import sys
 import time
+import datetime
 
 # Include I/O library for python in PYTHON PATH
 galileo_path = "/var/project"
@@ -21,8 +22,8 @@ while (True):
     temperature = analogRead(TEMP_PIN)
     luminosity = analogRead(LUM_PIN)
     n = datetime.datetime.now()
-    time = "%02d:%02d:%02d %d/%d/%d" % (n.hour, n.minute, n.second, n.day, n.month, n.year)
-    data = "H: %s T: %d L: %d" % (time, temperature, luminosity)
+    tStr = "%02d:%02d:%02d %d/%d/%d" % (n.hour, n.minute, n.second, n.day, n.month, n.year)
+    data = "H: %s T: %d L: %d" % (tStr, temperature, luminosity)
 
     try:
         # Connect to server and send data
