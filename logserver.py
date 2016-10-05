@@ -12,7 +12,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             file.write(str)
 
 if __name__ == "__main__":
-    HOST, PORT = "0.0.0.0", 9999
+    HOST, PORT = "192.168.25.77", 9999
 
     # Create the server, binding to localhost on port 4444
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
