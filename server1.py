@@ -24,8 +24,12 @@ class PersistentHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 # Thread to update index.html with new sensor readings
 class UpdateSensorValues(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.kill_received = False
+
     def run(self):
-        while (True):
+        while (not self.kill_received):
             temperature = analogRead(TEMP_PIN)
             luminosity = analogRead(LUM_PIN)
             file = open('index_std.html', 'r')
@@ -54,12 +58,19 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     # Handles requests in a separate thread.
     pass
 
-Handler = PersistentHandler
-httpd = ThreadedHTTPServer(("", PORT), Handler)
-httpd.allow_reuse_address = True
+if __name__ == "__main__":
+    Handler = PersistentHandler
+    httpd = ThreadedHTTPServer(("", PORT), Handler)
+    httpd.allow_reuse_address = True
 
-# Runs new thread
-UpdateSensorValues().start()
+    # Runs new thread
+    threadSensor = UpdateSensorValues()
+    threadSensor.start()
 
-print "serving at port", PORT
-httpd.serve_forever()
+    print "serving at port", PORT
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        threadSensor.kill_received = True
+    httpd.server_close()
+    print "Server killed"
