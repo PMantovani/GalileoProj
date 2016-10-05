@@ -8,10 +8,11 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print self.data
 
         with open("log.txt", "a") as file:
-            file.write(self.data)
+            str = "%s\n" % (self.data)
+            file.write(str)
 
 if __name__ == "__main__":
-    HOST, PORT = "192.168.25.77", 4444
+    HOST, PORT = "0.0.0.0", 9999
 
     # Create the server, binding to localhost on port 4444
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)

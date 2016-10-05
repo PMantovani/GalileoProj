@@ -2,7 +2,7 @@ import socket
 import sys
 import time
 
-HOST, PORT = "192.168.25.77", 4444
+HOST, PORT = "192.168.25.77", 9999
 data = "Teste"
 
 while (True):
@@ -12,7 +12,7 @@ while (True):
     try:
         # Connect to server and send data
         sock.connect((HOST, PORT))
-        sock.sendall(data + "\n")
+        sock.sendall(data)
     finally:
         sock.close()
 
