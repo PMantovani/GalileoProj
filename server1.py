@@ -14,7 +14,7 @@ if galileo_path not in sys.path:
 from pyGalileo import *
 
 
-PORT = 8000
+PORT = 80
 TEMP_PIN = A0
 LUM_PIN = A1
 
