@@ -10,8 +10,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     # Connect to server and send data
     sock.connect((HOST, PORT))
-    sock.sendall(data + "\n")
+    while (True):
+        sock.sendall(data + "\n")
+        delay(10000)
 finally:
     sock.close()
-
-print "Sent:     {}".format(data)

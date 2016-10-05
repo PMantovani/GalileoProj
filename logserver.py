@@ -8,8 +8,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print self.data
 
         with open("log.txt", "a") as file:
-            writeStr = "\n%s" % self.data
-            file.write(writeStr)
+            file.write(self.data)
 
 if __name__ == "__main__":
     HOST, PORT = "", 4444
