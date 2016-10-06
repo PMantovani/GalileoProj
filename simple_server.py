@@ -24,7 +24,16 @@ TEMP_PIN = A0
 LUM_PIN = A1
 REFRESH_PERIOD = 5
 
-def generateResponse():
+def generateResponse(isValidRequest):
+    # Caso a requisicao nao seja valida, retorne erro 400 Bad Request
+    if (not isValidRequest):
+        response = ("HTTP/1.1 400 Bad Request\n"
+            "Content-type: text/plain\n"
+            "Content-length: 22\n\n"
+            "Error 400. Bad Request")
+        return response
+    # Requisicao valida, prossiga
+
     # Le o arquivo html especificado em PAGE_NAME
     page = open(PAGE_NAME, "r")
     # pageStr armazena em string todo o arquivo
@@ -44,13 +53,29 @@ def generateResponse():
     response = "%s%s" % (header, pageStr)
     return response
 
+# Valida se a requisicao HTTP e valida
+def validateHTTPRequest(request):
+    # Separa a requisicao em items por whitespace
+    listRequest = request.split()
+    # Se a lista tiver menos de dois itens, a requisicao e invalida
+    if (len(listRequest) < 2):
+        return False
+    # Se o primeiro parametro nao for um GET, a requisicao e invalida
+    if (listRequest[0] != "GET"):
+        return False
+    # Se o segundo parametro nao requisitar o padrao, a requisicao e invalida
+    if (listRequest[1] != "/" or listRequest[1] != "/index.html"):
+        return False
+    # Se passar estas condicoes, a requisicao e valida
+    return True
+
 # Trata das requisicoes TCP em uma thread separada
 def handler(client_socket, addr):
     # Recebe dados (provavelmente HTTP)
     dataRecv = client_socket.recv(BUFFER)
     # Envia a resposta gerada pela funcao generateResponse()...
     # de volta para o client
-    client_socket.sendall(generateResponse())
+    client_socket.sendall(generateResponse(validateHTTPRequest(dataRecv)))
     # Fecha a conexao
     client_socket.close()
     # Termina a thread
