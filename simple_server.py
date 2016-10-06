@@ -23,6 +23,7 @@ PAGE_NAME = "index.html"
 TEMP_PIN = A0
 LUM_PIN = A1
 REFRESH_PERIOD = 5
+counter = 0
 
 def generateResponse(isValidRequest):
     # Caso a requisicao nao seja valida, retorne erro 400 Bad Request
@@ -108,12 +109,15 @@ class UpdateSensorValues(Thread):
             fileStr = fileStr.replace("$hora", timeStr)
             fileStr = fileStr.replace("$temp", str(temperature))
             fileStr = fileStr.replace("$lum", str(luminosity))
+            fileStr = fileStr.replace("$counter", str(counter))
 
             # Escreve as mudancas em index.html
             fileWrite = open("index.html", "w+")
             fileWrite.write(fileStr)
             fileWrite.close()
 
+            # Incrementa o contador de leituras
+            counter +=1
             # Dorme por N segundos, define o tempo de atualizacao da leitura
             # dos sensores
             time.sleep(REFRESH_PERIOD)
