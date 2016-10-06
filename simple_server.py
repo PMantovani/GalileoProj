@@ -64,7 +64,7 @@ def validateHTTPRequest(request):
     if (listRequest[0] != "GET"):
         return False
     # Se o segundo parametro nao requisitar o padrao, a requisicao e invalida
-    if (listRequest[1] != "/" or listRequest[1] != "/index.html"):
+    if (listRequest[1] != "/" and listRequest[1] != "/index.html"):
         return False
     # Se passar estas condicoes, a requisicao e valida
     return True
