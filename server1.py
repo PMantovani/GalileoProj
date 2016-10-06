@@ -5,6 +5,7 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
 import sys
 import datetime
+from time import sleep
 
 # Include I/O library for python in PYTHON PATH
 galileo_path = "/var/project"
@@ -52,7 +53,7 @@ class UpdateSensorValues(Thread):
             fileWrite.close()
 
             # delay for update
-            delay(5000)
+            time.sleep(5)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     # Handles requests in a separate thread.
