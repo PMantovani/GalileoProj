@@ -5,6 +5,7 @@ import sys
 import time
 from threading import Thread
 import datetime
+import os
 
 # Inclui a bilbioteca pyGalileo no PYTHON PATH
 # para leitura das I/Os
@@ -24,30 +25,60 @@ TEMP_PIN = A0
 LUM_PIN = A1
 REFRESH_PERIOD = 5
 
-def generateResponse(isValidRequest):
-    # Caso a requisicao nao seja valida, retorne erro 400 Bad Request
-    if (not isValidRequest):
+def generateResponse(validation):
+    # Extrai o codigo desta requisicao e o arquivo, caso aplicavel
+    code, filename = validation
+    # Verifica erro 400 Bad Request
+    if (code == "400"):
         response = ("HTTP/1.1 400 Bad Request\n"
             "Content-type: text/plain\n"
             "Content-length: 22\n\n"
             "Error 400. Bad Request")
         return response
+
+    # Verifica erro 404 File not found
+    if (code == "404"):
+        response = ("HTTP/1.1 400 File not found\n"
+            "Content-type: text/plain\n"
+            "Content-length: 25\n\n"
+            "Error 404. File not found")
+        return response
+
     # Requisicao valida, prossiga
 
-    # Le o arquivo html especificado em PAGE_NAME
-    page = open(PAGE_NAME, "r")
+    # Caso requisicao tenha sido "/", use o arquivo especificado por PAGE_NAME
+    if (filename == ""):
+        filename = PAGE_NAME
+
+    # Especifica o Content-Type para o header do HTTP
+    if (filename.lower().endswith(".html")):
+        cont_type = "text/html; charset=UTF-8"
+    elif (filename.lower().endswith(".png")):
+        cont_type = "image/png"
+    elif (filename.lower().endswith(".jpg")):
+        cont_type = "image/jpeg"
+    elif (filename.lower().endswith(".ico")):
+        cont_type = "image/x-icon"
+    else:
+        cont_type = "text/plain"
+
+    # Le o arquivo solicitado, em formato binario caso imagem
+    if (cont_type.startswith("image")):
+        page = open(filename, "rb")
+    else:
+        page = open(filename, "r")
     # pageStr armazena em string todo o arquivo
     pageStr = page.read()
     page.close()
 
     # Gera o header desta requisicao
     header = ("HTTP/1.1 200 OK\n"
-        "Content-Type: text/html; charset=UTF-8\n"
+        "Content-Type: %s\n"
         "Content-Encoding: UTF-8\n"
         "Content-Length: %d\n"
         "Server: SimpleServer\n"
         "Connection: close\n\n"
-        ) % len(pageStr)
+        ) % (cont_type, len(pageStr))
 
     # Concatena o header e o arquivo html para gerar a resposta
     response = "%s%s" % (header, pageStr)
@@ -59,15 +90,23 @@ def validateHTTPRequest(request):
     listRequest = request.split()
     # Se a lista tiver menos de dois itens, a requisicao e invalida
     if (len(listRequest) < 2):
-        return False
+        return ("400", "")
     # Se o primeiro parametro nao for um GET, a requisicao e invalida
     if (listRequest[0] != "GET"):
-        return False
-    # Se o segundo parametro nao requisitar o padrao, a requisicao e invalida
-    if (listRequest[1] != "/" and listRequest[1] != "/index.html"):
-        return False
+        return ("400", "")
+    # Caso o segundo parametro nao comece com /
+    if (not listRequest[1].startswith("/")):
+        return ("400", "")
+    # Corta o / da frente da requisicao
+    stripRequest = listRequest[1][1:]
+    # Evita que a requisicao acesse niveis superiores do sistema
+    if (".." in stripRequest):
+        return ("400", "")
+    # Verifica se o arquivo existe no sistema, e se requisicao nao foi /
+    if (not os.path.isfile(stripRequest) and stripRequest != ""):
+        return ("404", "")
     # Se passar estas condicoes, a requisicao e valida
-    return True
+    return ("200", stripRequest)
 
 # Trata das requisicoes TCP em uma thread separada
 def handler(client_socket, addr):
